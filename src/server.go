@@ -4,6 +4,8 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+    "os"
+    "io"
 	"net/http"
 	. "utils"
 )
@@ -23,12 +25,13 @@ func main() {
 		log.Panicf("get conf failed:%s", err.Error())
 	}
 	InitLog(logPath)
+	port, err := C.GetValue("server", "port")
 	log.Println("Starting v1 server,port=" + port)
-	http.HandleFunc("/get_car_record/", getCarRecord)
+	http.HandleFunc("/uploadImage/", uploadImage)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-func uploadImage(res http.ResponseWriter, req *http.Request) {
+func uploadImage(w http.ResponseWriter, r *http.Request) {
 	reader, err := r.MultipartReader()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -41,10 +44,10 @@ func uploadImage(res http.ResponseWriter, req *http.Request) {
 			break
 		}
 
-		fmt.Printf("FileName=[%s], FormName=[%s]\n", part.FileName(), part.FormName())
+		log.Printf("FileName=[%s], FormName=[%s]\n", part.FileName(), part.FormName())
 		if part.FileName() == "" { // this is FormData
 			data, _ := ioutil.ReadAll(part)
-			fmt.Printf("FormData=[%s]\n", string(data))
+			logt.Printf("FormData=[%s]\n", string(data))
 		} else { // This is FileData
 			dst, _ := os.Create("./" + part.FileName() + ".upload")
 			defer dst.Close()
