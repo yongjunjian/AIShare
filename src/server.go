@@ -47,12 +47,12 @@ func uploadImage(w http.ResponseWriter, r *http.Request) {
 		log.Printf("FileName=[%s], FormName=[%s]\n", part.FileName(), part.FormName())
 		if part.FileName() == "" { // this is FormData
 			data, _ := ioutil.ReadAll(part)
-			logt.Printf("FormData=[%s]\n", string(data))
+			log.Printf("FormData=[%s]\n", string(data))
 		} else { // This is FileData
 			dst, _ := os.Create("./" + part.FileName() + ".upload")
 			defer dst.Close()
 			io.Copy(dst, part)
 		}
 	}
-	res.Write([]byte(`{"code":0,"msg":"success"}`))
+	w.Write([]byte(`{"code":0,"msg":"success"}`))
 }
